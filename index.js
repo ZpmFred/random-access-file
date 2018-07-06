@@ -27,7 +27,7 @@ function RandomAccessFile (filename, opts) {
   this._size = opts.size || opts.length || 0
   this._truncate = !!opts.truncate || this._size > 0
   this._rmdir = !!opts.rmdir
-  this._mode = opts.mode || 0o666
+  this._mode = (opts.mode === undefined || opts.mode === null) ? 0o666 : opts.mode
 }
 
 inherits(RandomAccessFile, RandomAccess)
