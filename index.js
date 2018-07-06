@@ -27,6 +27,7 @@ function RandomAccessFile (filename, opts) {
   this._size = opts.size || opts.length || 0
   this._truncate = !!opts.truncate || this._size > 0
   this._rmdir = !!opts.rmdir
+  this._mode = opts.mode || 0o666
 }
 
 inherits(RandomAccessFile, RandomAccess)
@@ -138,8 +139,8 @@ RandomAccessFile.prototype._destroy = function (req) {
   }
 }
 
-function open (self, mode, req) {
-  fs.open(self.filename, mode, onopen)
+function open (self, flags, req) {
+  fs.open(self.filename, flags, self._mode, onopen)
 
   function onopen (err, fd) {
     if (err) return req.callback(err)
@@ -154,7 +155,7 @@ function open (self, mode, req) {
 
   function oncloseoldfd (err) {
     if (err) return onerrorafteropen(err)
-    if (!self._truncate || mode === READONLY) return req.callback(null)
+    if (!self._truncate || flags === READONLY) return req.callback(null)
     fs.ftruncate(self.fd, self._size, ontruncate)
   }
 
